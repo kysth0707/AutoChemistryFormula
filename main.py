@@ -1,58 +1,53 @@
-from AChemicalData import ChemicalData
 
-
-# ================ 필수 함수
-def isUpper(txt : str) -> bool:
-	return txt in list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-def isLower(txt : str) -> bool:
-	return txt in list("abcdefghijklmnopqrstuvwxyz")
-
-def isNum(txt : str) -> bool:
-	return txt in list('0123456789')
-
+import chemicalHelper
+import pygame
 
 # ================ 화학식 불러오기
-atomDatas = []
-with open('원자들.txt',encoding='utf8') as f:
-	for line in f.readlines():
-		code, name = line.rstrip().split()
-		atomDatas.append((code, name))
-# 원자 불러오기 완료
+atomDatas = chemicalHelper.getAtomDatas()
+chemicalDatas = chemicalHelper.getChemicalDatas()
 
-ChemicalDatas=[]
-with open('화학식.txt',encoding='utf8') as f:
-	for line in f.readlines():
-		if line[0] == '-':
-			formulaBeautiful, formula, name = line.replace('-','').rstrip().split(':')
-		else:
-			formula, name = line.rstrip().split(':')
-			formulaBeautiful = formula.replace('/','')
+# ================ 화면 리셋
+pygame.init()
 
-		outputDict = {}
+ScreenWidth = 900
+ScreenHeight = 600
+screen = pygame.display.set_mode((ScreenWidth, ScreenHeight))
+pygame.display.set_caption('자동 화학 계수 - kysth0707 김태형')
 
-		code = "?"
-		count = 1
-		for atom in formula.split('/'):
-			code = atom
-			if isNum(atom[-1]):
-				if isNum(atom[-2]):
-					# 2자리수
-					count = int(f"{atom[-2]}{atom[-1]}")
-					code = atom[:-2]
-				else:
-					# 1자리수
-					count = int(atom[-1])
-					code = atom[:-1]
 
-			
-			outputDict[code] = count
-		ChemicalDatas.append(
-			ChemicalData(
-				formulaBeautiful,
-				name,
-				outputDict
-			)
-		)
-# print(ChemicalDatas[0].formula, ChemicalDatas[0].name, ChemicalDatas[0].components)
-# 화학식 로드 완료
+# ================ 변수 설정
+formulaTextFont = pygame.font.SysFont("malgungothic", 50, True)
+formulaNumFont = pygame.font.SysFont("malgungothic", 35, True)
+
+
+# ================ 그리기 함수
+
+def drawText(pos : tuple, text : str):
+	x, y = pos
+	for txt in text:
+		if txt in list('0123456789'): # 숫자라면
+			screen.blit(formulaNumFont.render(txt, True, (0, 0, 0)), (x, y + 20))
+			x += 25
+		else: # 문자라면
+			screen.blit(formulaTextFont.render(txt, True, (0, 0, 0)), (x, y))
+			x += 45
+
+
+# ================ 반복문
+clock = pygame.time.Clock()
+run = True
+while run:
+	clock.tick(60)
+
+	# ================ 화면 그리기
+	screen.fill((230, 230, 230))
+
+	drawText((0, 0), "H2 + O2 -> H2O")
+
+	pygame.display.update()
+
+	# ================ 이벤트 처리
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			run = False
+			pygame.quit()
