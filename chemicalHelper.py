@@ -1,13 +1,3 @@
-class ChemicalData:
-	formula : str = "ASDF"
-	name : str = "ㅁㄴㅇㄹ"
-	components : dict = {}
-
-	def __init__(self, formula : str, name : str, components : dict) -> None:
-		self.formula = formula
-		self.name = name
-		self.components = components
-
 def isUpper(txt : str) -> bool:
 	return txt in list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
@@ -54,7 +44,7 @@ def getChemicalDatas() -> list:
 				
 				outputDict[code] = count
 			ChemicalDatas.append(
-				ChemicalData(
+				(
 					formulaBeautiful,
 					name,
 					outputDict
