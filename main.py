@@ -30,6 +30,7 @@ pygame.display.set_caption('자동 화학 계수 - kysth0707 김태형')
 # ================ 변수 설정
 formulaTextFont = pygame.font.SysFont("malgungothic", 45, True)
 formulaNumFont = pygame.font.SysFont("malgungothic", 35, True)
+topTextFont = pygame.font.SysFont("malgungothic", 30, True)
 
 PLUS = 0
 EQUAL = 1
@@ -47,8 +48,9 @@ def drawText(pos : tuple, data : list):
 	x, y = pos
 	for txt in data:
 		if type(txt) == tuple:
-			if len(txt) == 3:
-				name, _, count = txt
+			if len(txt) == 4:
+				name, _, count, topText = txt
+				screen.blit(topTextFont.render(topText, True, (0, 0, 0)), (x, y-60))
 			else:
 				name, count = txt
 			if int(count) != 1:
@@ -76,8 +78,8 @@ def getCursorPos(pos : tuple, data : list) -> tuple:
 	x, y = pos
 	for txt in data:
 		if type(txt) == tuple:
-			if len(txt) == 3:
-				name, _, count = txt
+			if len(txt) == 4:
+				name, _, count, _ = txt
 			else:
 				name, count = txt
 			if int(count) != 1:
@@ -94,7 +96,7 @@ def getCursorPos(pos : tuple, data : list) -> tuple:
 	return (x, y)
 
 # ================ 반복문
-formulaData = [("H2",{"H":2},2),PLUS,("O2",{"O":2},1),EQUAL,('H2O',{"H":2,"O":1},2)]
+formulaData = [("H2",{"H":2},2,"수소"),PLUS,("O2",{"O":2},1,"산소"),EQUAL,('H2O',{"H":2,"O":1},2,"물")]
 
 last = time.time()
 clock = pygame.time.Clock()
@@ -184,7 +186,7 @@ while run:
 						if len(helpList) > 0:
 							try:
 								formula, name, components = helpList[helpPos]
-								formulaData[cursorPos-1] = (formula, components, 1)
+								formulaData[cursorPos-1] = (formula, components, 1, name)
 							except:
 								pass
 			elif event.key == pygame.KSCAN_KP_ENTER or event.key == 13:
@@ -196,21 +198,71 @@ while run:
 					if data == EQUAL:
 						isBefore = False
 					elif data != PLUS:
-						_, c, _ = formulaData
+						_, c, _, _ = data
 						if isBefore:
 							beforeComponents.append(c)
 						else:
 							afterComponents.append(c)
 							# 내일 여기 하기
+				# beforeComponents = [{"H":2},{"O":2}]
+				# afterComponents = [{"H":2, "O":1}]
+				# beforeComponents = [{"H":2},{"O":2}]
+				# afterComponents = [{"H":2, "O":1}]
+
+				varDatas = [1 for _ in range(len(beforeComponents) + len(afterComponents))]
+
+				loopLimit = 6
+
+				for _ in range(loopLimit ** (len(beforeComponents) + len(afterComponents))):
+					testBefore = {}
+					testAfter = {}
+					for i, components in enumerate(beforeComponents):
+						for key, value in components.items():
+							if testBefore.get(key) == None:
+								testBefore[key] = value * varDatas[i]
+							else:
+								testBefore[key] += value * varDatas[i]
+					
+					for i, components in enumerate(afterComponents):
+						for key, value in components.items():
+							if testAfter.get(key) == None:
+								testAfter[key] = value * varDatas[len(beforeComponents)+i]
+							else:
+								testAfter[key] += value * varDatas[len(beforeComponents)+i]
+								
+
+					isSame = True
+					if sorted(testBefore.keys()) == sorted(testAfter.keys()):
+						for key in testBefore.keys():
+							if testBefore[key] != testAfter[key]:
+								isSame = False
+								break
+					
+					if isSame: # 계수 찾았고 설정하기
+						# formulaData = [("H2",{"H":2},2),PLUS,("O2",{"O":2},1),EQUAL,('H2O',{"H":2,"O":1},2)]
+						j = 0
+						for i, data in enumerate(formulaData):
+							if type(data) == tuple:
+								n,c,t,m = data
+								t = varDatas[j]
+								formulaData[i] = (n, c, t, m)
+								j += 1
+						break
+
+					varDatas[-1] += 1
+					for i, x in enumerate(varDatas):
+						if x > loopLimit:
+							varDatas[i] = 1
+							varDatas[i-1] += 1
 
 
 			elif event.key == pygame.K_BACKSPACE: #지우기
 				helpPos = 0
 				if cursorPos > 0:
 					if type(formulaData[cursorPos-1]) == tuple:
-						outputTxt, components, count = formulaData[cursorPos-1]
+						outputTxt, components, count, name = formulaData[cursorPos-1]
 						if len(outputTxt) > 0:
-							formulaData[cursorPos-1] = (outputTxt[:-1], components, count)
+							formulaData[cursorPos-1] = (outputTxt[:-1], components, count, name)
 						else:
 							del formulaData[cursorPos-1]
 							cursorPos -= 1
@@ -225,11 +277,11 @@ while run:
 					continue
 				if cursorPos > 0:
 					if type(formulaData[cursorPos-1]) == tuple:
-						outputTxt, components, count = formulaData[cursorPos-1]
+						outputTxt, components, count, name = formulaData[cursorPos-1]
 						outputTxt += pressedKey
 						components[pressedKey] = 1
-						formulaData[cursorPos-1] = (outputTxt, components, count)
+						formulaData[cursorPos-1] = (outputTxt, components, count, name)
 						continue
-				formulaData.insert(cursorPos, (pressedKey, {pressedKey:1}, 1))
+				formulaData.insert(cursorPos, (pressedKey, {pressedKey:1}, 1, "?"))
 				cursorPos += 1
 

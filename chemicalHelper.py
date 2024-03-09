@@ -28,8 +28,8 @@ def getChemicalDatas() -> list:
 			outputDict = {}
 
 			code = "?"
-			count = 1
 			for atom in formula.split('/'):
+				count = 1
 				code = atom
 				if isNum(atom[-1]):
 					if isNum(atom[-2]):
