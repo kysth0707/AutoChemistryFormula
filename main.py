@@ -10,6 +10,9 @@ import pygame
 atomDatas = chemicalHelper.getAtomDatas()
 chemicalDatas = chemicalHelper.getChemicalDatas()
 
+for d in atomDatas:
+	chemicalDatas.append(d)
+
 # helpDict = {}
 # alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 # for c in alphabets:
@@ -31,6 +34,8 @@ pygame.display.set_caption('자동 화학 계수 - kysth0707 김태형')
 formulaTextFont = pygame.font.SysFont("malgungothic", 45, True)
 formulaNumFont = pygame.font.SysFont("malgungothic", 35, True)
 topTextFont = pygame.font.SysFont("malgungothic", 30, True)
+
+LOOP_LIMIT = 15
 
 PLUS = 0
 EQUAL = 1
@@ -211,9 +216,7 @@ while run:
 
 				varDatas = [1 for _ in range(len(beforeComponents) + len(afterComponents))]
 
-				loopLimit = 6
-
-				for _ in range(loopLimit ** (len(beforeComponents) + len(afterComponents))):
+				for _ in range(LOOP_LIMIT ** (len(beforeComponents) + len(afterComponents))):
 					testBefore = {}
 					testAfter = {}
 					for i, components in enumerate(beforeComponents):
@@ -251,7 +254,7 @@ while run:
 
 					varDatas[-1] += 1
 					for i, x in enumerate(varDatas):
-						if x > loopLimit:
+						if x > LOOP_LIMIT:
 							varDatas[i] = 1
 							varDatas[i-1] += 1
 

@@ -12,7 +12,9 @@ def getAtomDatas() -> list:
 	with open('원자들.txt',encoding='utf8') as f:
 		for line in f.readlines():
 			code, name = line.rstrip().split()
-			atomDatas.append((code, name))
+			atomDatas.append(
+				(code, name, {code : 1})
+			)
 	return atomDatas
 
 def getChemicalDatas() -> list:
