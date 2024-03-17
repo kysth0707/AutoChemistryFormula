@@ -1,3 +1,11 @@
+"""
+1. 숫자 뒤에 바   KACe1/2/3/Fa
+2. 소문자 뒤에 바  KACe/1/2/3/Fa/
+3. 바 숫자 삭제 KACe123/Fa/
+4. 대 바 대 K/A/Ce123/Fa/
+
+"""
+
 def isUpper(txt : str) -> bool:
 	return txt in list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
@@ -6,16 +14,6 @@ def isLower(txt : str) -> bool:
 
 def isNum(txt : str) -> bool:
 	return txt in list('0123456789')
-
-def getAtomDatas() -> list:
-	atomDatas = []
-	with open('원자들.txt',encoding='utf8') as f:
-		for line in f.readlines():
-			code, name = line.rstrip().split()
-			atomDatas.append(
-				(code, name, {code : 1})
-			)
-	return atomDatas
 
 def getChemicalDatas() -> list:
 	ChemicalDatas=[]

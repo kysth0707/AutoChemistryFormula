@@ -34,6 +34,7 @@ pygame.display.set_caption('자동 화학 계수 - kysth0707 김태형')
 formulaTextFont = pygame.font.SysFont("malgungothic", 45, True)
 formulaNumFont = pygame.font.SysFont("malgungothic", 35, True)
 topTextFont = pygame.font.SysFont("malgungothic", 30, True)
+tutorialFont = pygame.font.SysFont("malgungothic", 25, True)
 
 LOOP_LIMIT = 15
 
@@ -103,6 +104,8 @@ def getCursorPos(pos : tuple, data : list) -> tuple:
 # ================ 반복문
 formulaData = [("H2",{"H":2},2,"수소"),PLUS,("O2",{"O":2},1,"산소"),EQUAL,('H2O',{"H":2,"O":1},2,"물")]
 
+tutorialText = tutorialFont.render('화살표 : 이동 / + : + / Space : -> / Delete : 전체삭제 / Tab : 자동완성 / Backspace : 지우기 / 영어 : 영어', True, (0, 0, 0))
+
 last = time.time()
 clock = pygame.time.Clock()
 run = True
@@ -141,6 +144,8 @@ while run:
 
 	# ================ 화면 그리기
 	screen.fill((255, 255, 255))
+
+	screen.blit(tutorialText, (10, ScreenHeight - 50))
 
 	temp = formulaData.copy()
 	temp.insert(cursorPos, CURSOR)
@@ -272,6 +277,9 @@ while run:
 					else:
 						del formulaData[cursorPos-1]
 						cursorPos -= 1
+			elif event.key == pygame.K_DELETE or event.key == pygame.KSCAN_DELETE:
+				formulaData = []
+				cursorPos = 0
 			else:
 				pressedKey = pygame.key.name(event.key).upper()
 				if len(pressedKey) == 3 and pressedKey[0] == '[' and pressedKey[2] == ']':
